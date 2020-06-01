@@ -42,11 +42,11 @@ public class InteractionButton : WcsButton
     internal override void OnSetActive()
     {
         buttonObject.interactable
-            = pc.workload >= minWorkload && pc.workload <= maxWorkload
-            && pc.approval_Work >= minWorkApproval && pc.approval_Work <= maxWorkApproval
-            && pc.approval_Partner >= minPartnerApproval && pc.approval_Work <= maxPartnerApproval
-            && pc.approval_Friend >= minFriendApproval && pc.approval_Work <= maxFriendApproval
-            && pc.approval_Mom >= minMomApproval && pc.approval_Work <= maxMomApproval
+            = pc.Workload >= minWorkload && pc.Workload <= maxWorkload
+            && pc.WorkApproval >= minWorkApproval && pc.WorkApproval <= maxWorkApproval
+            && pc.PartnerApproval >= minPartnerApproval && pc.PartnerApproval <= maxPartnerApproval
+            && pc.FriendApproval >= minFriendApproval && pc.FriendApproval <= maxFriendApproval
+            && pc.MomApproval >= minMomApproval && pc.MomApproval <= maxMomApproval
             && gameManager.IsTimeAvailable(durationInHours);
     }
 }

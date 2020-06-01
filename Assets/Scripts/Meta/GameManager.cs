@@ -7,25 +7,35 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    private float _currentHour;
+    private Stage _currentStage;
+
+    private float _currentHour = 9.5f;
     public float CurrentHour
     {
         get => _currentHour;
         set
         {
             _currentHour = value;
+            _currentStage.OnTimeChange(_currentHour);
 
-            if (_clock != null)
-                _clock.SetTime(_currentHour);
+            PlayerPrefs.SetFloat("CurrentHour", _currentHour);
         }
     }
-
-    private string _currentLocation;
 
     public DialogueManager _dialogueManager;
 
     public PlayerCharacter pc;
+
     private float _unavailableColleagueHours;
+    public float UnavailableColleagueHours
+    {
+        get => _unavailableColleagueHours;
+        set
+        {
+            _unavailableColleagueHours = value;
+            PlayerPrefs.SetFloat("UnavailableColleagueHours", _unavailableColleagueHours);
+        }
+    }
 
     [HideInInspector] public enum State { FREE, DIALOGUE, CUTSCENE };
     private State _currentState = State.FREE;
@@ -35,42 +45,41 @@ public class GameManager : MonoBehaviour
         set
         {
             _currentState = value;
-            _disableInteractionFilterImage.gameObject.SetActive(_currentState == State.DIALOGUE);
         }
     }
 
-    private Image _disableInteractionFilterImage;
+    private Image _dialogueFilter;
     private Animator _screenFadeFilterAnimator;
-
-    private Clock _clock;
 
     private void Awake()
     {
-        if (_dialogueManager == null) // TODO: Remove this
-            _dialogueManager = FindObjectOfType<DialogueManager>();
+        _dialogueManager = FindObjectOfType<DialogueManager>();
+        _currentStage = FindObjectOfType<Stage>();
 
         _screenFadeFilterAnimator = GetComponentsInChildren<Animator>(true)[0];
-        _disableInteractionFilterImage = GetComponentsInChildren<Image>(true)[1];
-        _clock = FindObjectOfType<Clock>();
+
+        Debug.Log("TEST: AWOKEN");
     }
 
     private void Start()
     {
-        CurrentHour = 9.5f;
         _dialogueManager.StartDialogue(DialogueManager.DialogueKey.DAY_1_BARRINGTON_GOOD_MORNING);
+
+        CurrentHour = PlayerPrefs.GetFloat("CurrentHour");
+        Debug.Log("Current hour = " + CurrentHour + " (according to PlayerPrefs: " + PlayerPrefs.GetFloat("CurrentHour"));
+        UnavailableColleagueHours = PlayerPrefs.GetFloat("UnavailableColleagueHours");
     }
 
     public void ChangeScene(string sceneName)
     {
         StartCoroutine(SceneTransition(sceneName));
-        _currentLocation = sceneName;
     }
 
     private IEnumerator SceneTransition(string sceneName)
     {
         _screenFadeFilterAnimator.gameObject.SetActive(true);
-        _screenFadeFilterAnimator.Play("Fade_2s");
-        yield return new WaitForSeconds(1);
+        _screenFadeFilterAnimator.Play("FadeToBlack");
+        yield return new WaitForSeconds(0.5f);
         LoadScene(sceneName);
     }
 
@@ -98,7 +107,6 @@ public class GameManager : MonoBehaviour
     private void LoadScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
-        Awake();
     }
 
     public void MoveTimeForward(float hours)
@@ -109,8 +117,8 @@ public class GameManager : MonoBehaviour
 
         CurrentHour += hours;
 
-        _unavailableColleagueHours -= hours;
-        if (_currentHour >= 17)
+        UnavailableColleagueHours -= hours;
+        if (CurrentHour >= 17)
         {
             EndWorkingDay();
         }
@@ -118,13 +126,7 @@ public class GameManager : MonoBehaviour
 
     private void EndWorkingDay()
     {
-        switch(_currentLocation)
-        {
-            case "Office":
-                break;
-            case "Home":
-                break;
-        }
+        throw new NotImplementedException();
     }
 
     internal bool ColleagueReadilyAvailable()
@@ -139,7 +141,7 @@ public class GameManager : MonoBehaviour
         MoveTimeForward(0.75f);
         if (_unavailableColleagueHours >= 4)
         {
-            pc.AlterApproval_Work(-2);
+            pc.AlterWorkApproval(-2);
         }
         else if (_unavailableColleagueHours < 0)
         {

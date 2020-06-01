@@ -11,7 +11,7 @@ public class ScreenFadeFilter : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
     }
 
-    public void SetGameManagerStateFree()
+    public void SetActiveFalseAndStateFree()
     {
         gameObject.SetActive(false);
         gameManager.CurrentState = GameManager.State.FREE;

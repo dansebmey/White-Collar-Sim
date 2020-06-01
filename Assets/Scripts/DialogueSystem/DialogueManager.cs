@@ -8,13 +8,12 @@ using UnityEngine.UI;
 [System.Serializable]
 public class DialogueManager : WcsUIObjectBase
 {
-    protected internal GameManager gameManager;
-
     [Header("JSON Input")]
     public TextAsset conversationsJson;
     public TextAsset conversantsJson;
 
     private Animator _animator;
+    private Image _dialogueFilter;
 
     private Transform _playerSide;
     private Transform _otherSide;
@@ -57,6 +56,8 @@ public class DialogueManager : WcsUIObjectBase
         base.Awake();
         gameManager = FindObjectOfType<GameManager>();
 
+        _dialogueFilter = GetComponentsInChildren<Image>(true)[0];
+
         _animator = GetComponent<Animator>();
         _playerSide = GetComponentsInChildrenWithTag<Transform>("DialogueSide")[0];
         _playerSideName = _playerSide.GetComponentsInChildren<Text>()[0];
@@ -96,7 +97,7 @@ public class DialogueManager : WcsUIObjectBase
                     {
                         new DialogueOption(new Sentence(-1, this, "Harry", "Sure am!", 2)),
                         new DialogueOption(new Sentence(-1, this, "Harry", "Eh, I suppose so.", 5),
-                            new Action(() => gameManager.pc.AlterApproval_Work(1)))
+                            new Action(() => gameManager.pc.AlterWorkApproval(1)))
                     }),
                 new Sentence(2, this, "Barrington", "That's the spirit!"),
                 new Sentence(3, this, "Barrington", "Have a nice day, Harry. And tell me if you need anything."),
@@ -136,7 +137,7 @@ public class DialogueManager : WcsUIObjectBase
                     {
                         new DialogueOption(new Sentence(-1, this, "Harry", "Alrighty then... sorry for asking.",
                             new Action(() => EndConversation())),
-                            new Action(() => gameManager.pc.AlterApproval_Work(-1))),
+                            new Action(() => gameManager.pc.AlterWorkApproval(-1))),
                         new DialogueOption(new Sentence(-1, this, "Harry", "Sorry. I won't disturb you anymore.",
                             new Action(() => EndConversation())))
                     }),
@@ -202,6 +203,8 @@ public class DialogueManager : WcsUIObjectBase
 
     public void StartDialogue(DialogueKey key)
     {
+        _dialogueFilter.gameObject.SetActive(true);
+
         gameManager.CurrentState = GameManager.State.DIALOGUE;
         gameObject.SetActive(true);
         foreach(OptionButton button in _optionButtons)
@@ -340,6 +343,7 @@ public class DialogueManager : WcsUIObjectBase
     {
         _animator.Play("ConversationBar_FadeOut");
         gameManager.CurrentState = GameManager.State.FREE;
+        _dialogueFilter.gameObject.SetActive(false);
     }
 
     public void SetInactive()
