@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\mc_me\.Rider2019.3\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\mc_me\.Rider2019.3\system\resharper-host\local\Transient\ReSharperHost\v193\SolutionCaches\_White Collar Simulator.-1556681210.00" t="ExcludeRecursive" />
+    <e p="D:\Data\Game dev\Unity\White Collar Simulator" t="IncludeRecursive">
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets" t="Include">
+        <e p="Scripts" t="Include">
+          <e p="Conversations" t="Include">
+            <e p="ConversationManager.cs" t="Include" />
+            <e p="Conversations" t="Include">
+              <e p="Conversation.cs" t="Include" />
+            </e>
+            <e p="Dialogs" t="Include">
+              <e p="AnswerableDialogue.cs" t="Include" />
+              <e p="Conversant.cs" t="Include" />
+              <e p="Dialogue.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Decision.cs" t="Include" />
+          <e p="GameManager.cs" t="Include" />
+          <e p="JSONReader.cs" t="Include" />
+        </e>
+      </e>
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="Packages" t="ExcludeRecursive" />
+      <e p="Temp\bin" t="ExcludeRecursive" />
+      <e p="White Collar Simulator.sln" t="IncludeFlat" />
+    </e>
+  </component>
+</project>

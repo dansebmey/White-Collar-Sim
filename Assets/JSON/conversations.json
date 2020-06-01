@@ -1,0 +1,25 @@
+{
+	"conversations" : [
+		{
+			"dialogues": [
+				{
+					"answerable": "false"
+					
+				}
+			],
+			"audience": "Grandparents",
+			"prompt_you_NL": "Houdt je van pittig eten?",
+			"prompt_they_NL": "Houdt <naam> van pittig eten?",
+			"prompt_you_EN": "Do you like spicy food?",
+			"prompt_they_EN": "Does <naam> like spicy food?"
+		},
+		{
+			"category": "Lifestyle",
+			"audience": "Grandparents",
+			"prompt_you_NL": "Vind je het leuk om te koken?",
+			"prompt_they_NL": "Vindt <naam> het leuk om te koken?",
+			"prompt_you_EN": "Do you like to cook?",
+			"prompt_they_EN": "Does <naam> like to cook?"
+		}],
+	}
+}
