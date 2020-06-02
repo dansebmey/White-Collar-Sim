@@ -4,7 +4,7 @@ using UnityEngine;
  
 public class JSONReader
 {
-    public static List<T> ParseInput<T>(DialogueManager conversationManager, TextAsset jsonFile) 
+    public static List<T> ParseInput<T>(TextAsset jsonFile) 
     {
         List<T> list = JsonUtility.FromJson<List<T>>(jsonFile.text);
  

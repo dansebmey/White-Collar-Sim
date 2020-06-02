@@ -6,11 +6,9 @@ using System;
 public class AnswerableSentence : Sentence
 {
     internal List<DialogueOption> AvailableOptions;
-    private DialogueManager _conversationManager;
     
-    public AnswerableSentence(int nodeIndex, DialogueManager conversationManager, string speakerName, string text, List<DialogueOption> availableChoices) : base(nodeIndex, conversationManager, speakerName, text)
+    public AnswerableSentence(int nodeIndex, string speakerName, string text, List<DialogueOption> availableChoices) : base(nodeIndex, speakerName, text)
     {
-        _conversationManager = conversationManager;
         AvailableOptions = availableChoices;
     }
 

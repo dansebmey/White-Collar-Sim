@@ -1,16 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Dialogue
 {
-    public bool exitNode;
-    internal DialogueManager dialogueManager;
+    public bool isOncePerDay;
     public List<Sentence> sentences;
+    internal Appointment linkedAppointment;
 
-    public Dialogue(DialogueManager dialogueManager, List<Sentence> sentences)
+    internal bool WasHeld { get; set; }
+
+    public Dialogue(bool isOncePerDay, List<Sentence> sentences)
     {
-        this.dialogueManager = dialogueManager;
+        this.isOncePerDay = isOncePerDay;
         this.sentences = sentences;
     }
 }

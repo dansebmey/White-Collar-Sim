@@ -5,7 +5,6 @@ using System;
 
 public class Sentence
 {
-    // private DialogueManager _conversationManager;
     public DialogueManager.ConversantKey conversantKey;
 
     public int nodeIndex;
@@ -16,21 +15,21 @@ public class Sentence
 
     internal Action action;
 
-    public Sentence(int nodeIndex, DialogueManager dialogueManager, string speakerName, string text, Action action = null)
+    public Sentence(int nodeIndex, string speakerName, string text, Action action = null)
     {
         this.nodeIndex = nodeIndex;
 
-        this.speaker = dialogueManager.GetConversant(speakerName);
+        this.speaker = DialogueManager.GetInstance().GetConversant(speakerName);
         this.text = text;
 
         this.action = action;
     }
 
-    public Sentence(int nodeIndex, DialogueManager dialogueManager, string speakerName, string text, int nextNodeIndex)
+    public Sentence(int nodeIndex, string speakerName, string text, int nextNodeIndex)
     {
         this.nodeIndex = nodeIndex;
 
-        this.speaker = dialogueManager.GetConversant(speakerName);
+        this.speaker = DialogueManager.GetInstance().GetConversant(speakerName);
         this.text = text;
 
         this.nextNodeIndex = nextNodeIndex;

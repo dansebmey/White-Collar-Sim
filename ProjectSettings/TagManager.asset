@@ -10,6 +10,7 @@ TagManager:
   - OptionRow
   - FilterImage
   - InteractionButton
+  - WorkloadCounter
   layers:
   - Default
   - TransparentFX

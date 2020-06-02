@@ -8,14 +8,11 @@ using UnityEngine.UI;
 public abstract class WcsUIObjectBase : MonoBehaviour, IPointerDownHandler, 
     IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    protected GameManager gameManager;
-    protected DialogueManager dialogueManager;
     protected bool _isSelected;
 
-    internal virtual void Awake() // TODO: InteractableUIObject should be split into 'WCSButton' and 'WCSClickableArea'
+    internal virtual void Awake()
     {
-        gameManager = FindObjectOfType<GameManager>();
-        dialogueManager = FindObjectOfType<DialogueManager>();
+        
     }
 
     public virtual void OnPointerDown(PointerEventData eventData)
@@ -34,7 +31,7 @@ public abstract class WcsUIObjectBase : MonoBehaviour, IPointerDownHandler,
 
     protected virtual bool CanBeClicked()
     {
-        return gameManager.CurrentState == GameManager.State.FREE;
+        return GameManager.GetInstance().CurrentState == GameManager.State.FREE;
     }
 
     public virtual void OnPointerEnter(PointerEventData eventData)

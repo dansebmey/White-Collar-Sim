@@ -7,24 +7,35 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    private Stage _currentStage;
+    static GameManager instance;
+    public static GameManager GetInstance()
+    {
+        return instance;
+    }
 
-    private float _currentHour = 9.5f;
+    private static int _currentDay = 1;
+    public int CurrentDay
+    {
+        get => _currentDay;
+        set
+        {
+            _currentDay = value;
+
+        }
+    }
+
+    private static float _currentHour = 9.5f;
     public float CurrentHour
     {
         get => _currentHour;
         set
         {
             _currentHour = value;
-            _currentStage.OnTimeChange(_currentHour);
-
-            PlayerPrefs.SetFloat("CurrentHour", _currentHour);
+            FindObjectOfType<Stage>().OnTimeChange(_currentHour);
         }
     }
 
-    public DialogueManager _dialogueManager;
-
-    public PlayerCharacter pc;
+    internal PlayerCharacter pc;
 
     private float _unavailableColleagueHours;
     public float UnavailableColleagueHours
@@ -33,7 +44,6 @@ public class GameManager : MonoBehaviour
         set
         {
             _unavailableColleagueHours = value;
-            PlayerPrefs.SetFloat("UnavailableColleagueHours", _unavailableColleagueHours);
         }
     }
 
@@ -45,88 +55,107 @@ public class GameManager : MonoBehaviour
         set
         {
             _currentState = value;
+            if(_currentState == State.FREE)
+            {
+                CheckForAppointments();
+                if(FindObjectOfType<Stage>() is OfficeStage
+                    && CurrentHour >= 13 && CurrentHour < 14
+                    && pc.WorkloadInHours >= WorkingHoursLeftUntil(17) * 2)
+                {
+                    DialogueManager.GetInstance().StartConversation(DialogueManager.DialogueKey.WARNING_WORKING_TOO_LITTLE);
+                }
+            }
         }
     }
 
-    private Image _dialogueFilter;
-    private Animator _screenFadeFilterAnimator;
+    private void CheckForAppointments()
+    {
+        foreach (Appointment appointment in pc.appointments)
+        {
+            if (appointment.IsToday(_currentDay)
+                && !appointment.hasOccurredToday
+                && (CurrentHour >= appointment.startingHour && CurrentHour < appointment.endingHour))
+            {
+                if(appointment.linkedDialogueKeyString != "")
+                {
+                    DialogueManager.GetInstance().LinkAppointmentToDialogue(appointment.linkedDialogueKeyString, appointment);
+                }
+                appointment.StartEvent();
+            }
+        }
+    }
 
     private void Awake()
     {
-        _dialogueManager = FindObjectOfType<DialogueManager>();
-        _currentStage = FindObjectOfType<Stage>();
-
-        _screenFadeFilterAnimator = GetComponentsInChildren<Animator>(true)[0];
-
-        Debug.Log("TEST: AWOKEN");
-    }
-
-    private void Start()
-    {
-        _dialogueManager.StartDialogue(DialogueManager.DialogueKey.DAY_1_BARRINGTON_GOOD_MORNING);
-
-        CurrentHour = PlayerPrefs.GetFloat("CurrentHour");
-        Debug.Log("Current hour = " + CurrentHour + " (according to PlayerPrefs: " + PlayerPrefs.GetFloat("CurrentHour"));
-        UnavailableColleagueHours = PlayerPrefs.GetFloat("UnavailableColleagueHours");
-    }
-
-    public void ChangeScene(string sceneName)
-    {
-        StartCoroutine(SceneTransition(sceneName));
-    }
-
-    private IEnumerator SceneTransition(string sceneName)
-    {
-        _screenFadeFilterAnimator.gameObject.SetActive(true);
-        _screenFadeFilterAnimator.Play("FadeToBlack");
-        yield return new WaitForSeconds(0.5f);
-        LoadScene(sceneName);
-    }
-
-    internal bool IsTimeAvailable(float hours)
-    {
-        // TODO: make this generic by looping through a collection of planned mandatory events
-        // such as lunch and meetings, but not personally planned things such as private calls.
-        // The character should have an agenda, basically. Or should they be allowed to forget things?
-        if (CurrentHour < 12)
+        if (instance != null)
         {
-            return CurrentHour + hours <= 12;
+            Destroy(this.gameObject);
+            return;
         }
-        else if (CurrentHour < 17)
+        instance = this;
+
+        pc = GetComponentInChildren<PlayerCharacter>();
+    }
+
+    public void NextDay()
+    {
+        FindObjectOfType<SceneLoader>().ChangeScene("Home");
+        CurrentDay++;
+        CurrentHour = 9.5f;
+        
+        foreach(Dialogue dialogue in DialogueManager.GetInstance().dialogueStorage.Values)
         {
-            return CurrentHour + hours <= 17;
+            dialogue.WasHeld = false;
         }
-        else return true;
+
+        foreach(Appointment appointment in pc.appointments)
+        {
+            appointment.hasOccurredToday = false;
+        }
+
+        pc.StressLevel -= 4;
+        pc.ConsecutiveHoursWorked = 0;
+        pc.WorkloadInHours += 8;
     }
 
-    public void StartConversation(string conversationSceneName, Dialogue conversation)
+    public void MoveTimeForward(float hours, bool workRelated)
     {
-        LoadScene(conversationSceneName);
-    }
+        FindObjectOfType<SceneLoader>().Play("Fade_2s");
 
-    private void LoadScene(string sceneName)
-    {
-        SceneManager.LoadScene(sceneName);
+        if(workRelated)
+        {
+            pc.ConsecutiveHoursNotWorked = 0;
+            pc.AlterConsecutiveHoursWorked(hours);
+        }
+        else
+        {
+            pc.AlterConsecutiveHoursNotWorked(hours);
+        }
+
+        CurrentHour += hours;
+        UnavailableColleagueHours -= hours;
     }
 
     public void MoveTimeForward(float hours)
     {
-        _screenFadeFilterAnimator.gameObject.SetActive(true);
-        _currentState = State.CUTSCENE;
-        _screenFadeFilterAnimator.Play("Fade_2s");
+        FindObjectOfType<SceneLoader>().Play("Fade_2s");
+
+        pc.AlterConsecutiveHoursNotWorked(hours);
 
         CurrentHour += hours;
-
         UnavailableColleagueHours -= hours;
-        if (CurrentHour >= 17)
-        {
-            EndWorkingDay();
-        }
     }
 
-    private void EndWorkingDay()
+    public void StartLunchBreak(float hours)
     {
-        throw new NotImplementedException();
+        FindObjectOfType<SceneLoader>().Play("Fade_2s");
+
+        pc.StressLevel -= 2;
+        pc.WorkApproval++;
+        pc.ResetConsecutiveHoursWorked();
+
+        CurrentHour += hours;
+        UnavailableColleagueHours -= hours;
     }
 
     internal bool ColleagueReadilyAvailable()
@@ -136,9 +165,9 @@ public class GameManager : MonoBehaviour
 
     internal void OnColleagueAssistance()
     {
-        _dialogueManager.EndConversation();
+        DialogueManager.GetInstance().EndConversation();
         pc.AlterWorkload(-1);
-        MoveTimeForward(0.75f);
+        MoveTimeForward(0.5f, true);
         if (_unavailableColleagueHours >= 4)
         {
             pc.AlterWorkApproval(-2);
@@ -148,5 +177,26 @@ public class GameManager : MonoBehaviour
             _unavailableColleagueHours = 0;
         }
         _unavailableColleagueHours += 4;
+    }
+
+    internal float WorkingHoursLeftUntil(int hour)
+    {
+        float extraSubtraction = 0;
+        foreach(Appointment appointment in pc.appointments)
+        {
+            if(appointment.IsToday(CurrentDay)
+                && appointment.isFormal
+                && !appointment.hasOccurredToday
+                && appointment.startingHour < hour)
+            {
+                extraSubtraction += appointment.Duration();
+            }
+        }
+        return hour - CurrentHour - extraSubtraction;
+    }
+
+    public void ResetUnavailableColleagueHours()
+    {
+        UnavailableColleagueHours = 0;
     }
 }

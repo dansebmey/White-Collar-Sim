@@ -11,14 +11,15 @@ public class DigitalClock : Clock
         _textObject = GetComponent<Text>();
     }
 
-    internal override void SetTime(float hours)
+    internal override void SetTime(float currentHour)
     {
-        int minutes = (int)((hours % 1) * 60);
+        int minutes = (int)((currentHour % 1) * 60);
 
         _textObject.text
-            = Mathf.Floor(hours).ToString() 
-            + ":" 
+            = (currentHour < 10 ? "0" : "")
+            + Mathf.Floor(currentHour).ToString()
+            + ":"
             + (minutes < 10 ? "0" : "")
-            + ((hours % 1) * 6).ToString();
+            + minutes;
     }
 }
