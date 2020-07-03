@@ -16,6 +16,12 @@ public abstract class WcsButton : WcsUIObjectBase
         buttonObject = GetComponent<Button>();
     }
 
+    public override void OnPointerEnter(PointerEventData eventData)
+    {
+        base.OnPointerEnter(eventData);
+        AudioManager.GetInstance().Play("hover", 0.05f);
+    }
+
     internal virtual void OnSetActive()
     {
 

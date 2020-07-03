@@ -28,6 +28,9 @@ public class OptionButton : WcsButton
     protected override void OnFullMouseClick(PointerEventData eventData)
     {
         if(isEnabled)
+        {
+            AudioManager.GetInstance().Play("click", 0.05f);
             DialogueManager.GetInstance().OptionSelected(buttonIndex);
+        }
     }
 }

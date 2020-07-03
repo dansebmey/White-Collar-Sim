@@ -41,8 +41,9 @@ public class InteractionButton : WcsButton
 
     protected override void OnFullMouseClick(PointerEventData eventData)
     {
-        if(buttonObject.interactable) 
+        if(buttonObject.interactable)
         {
+            AudioManager.GetInstance().Play("click", 0.05f);
             if (durationInHours > 0)
             {
                 GameManager.GetInstance().MoveTimeForward(baseDurationInHours, workRelated);

@@ -352,6 +352,9 @@ public class DialogueManager : WcsUIObjectBase
 
     public void StartConversation(DialogueKey key)
     {
+        AudioManager.GetInstance().Play("open");
+        AudioManager.GetInstance().SetVolume("bg-music", 0.3f);
+
         Dialogue dialogue = dialogueStorage[key];
         if (!(dialogue.WasHeld && dialogue.isOncePerDay))
         {
@@ -440,6 +443,7 @@ public class DialogueManager : WcsUIObjectBase
             }
             float typeSpeed = typingSpeed;
 
+            AudioManager.GetInstance().Play("mumble", 0.03f);
             textObject.text += c;
             switch (c)
             {
@@ -491,7 +495,7 @@ public class DialogueManager : WcsUIObjectBase
 
     protected override void OnFullMouseClick(PointerEventData eventData)
     {
-        if(_isCurrentlyTypingText)
+        if (_isCurrentlyTypingText)
         {
             _isCurrentlyTypingText = false;
         }
@@ -528,6 +532,9 @@ public class DialogueManager : WcsUIObjectBase
 
     public void EndConversation()
     {
+        AudioManager.GetInstance().Play("close");
+        AudioManager.GetInstance().SetVolume("bg-music", 0.55f);
+
         _currentDialogue.WasHeld = true;
 
         _animator.Play("ConversationBar_FadeOut");

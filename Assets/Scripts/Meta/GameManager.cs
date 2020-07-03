@@ -95,6 +95,9 @@ public class GameManager : MonoBehaviour
         instance = this;
 
         pc = GetComponentInChildren<PlayerCharacter>();
+
+        AudioManager.GetInstance().Play("bg-music");
+        AudioManager.GetInstance().SetVolume("bg-music", 0.55f);
     }
 
     public void NextDay()
